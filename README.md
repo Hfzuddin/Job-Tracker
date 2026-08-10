@@ -15,7 +15,7 @@ The fastest way to get JobTrack running on any machine. No need to install PHP, 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Hfzuddin/Job-Tracker.git
-cd JobTrack
+cd Job-Tracker
 
 # 2. Start the development environment
 docker compose up --build
