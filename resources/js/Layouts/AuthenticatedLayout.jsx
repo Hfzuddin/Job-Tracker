@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import IdleLogoutWarning from '@/Components/IdleLogoutWarning';
 import { Link, usePage } from '@inertiajs/react';
 import useTheme from '@/Hooks/useTheme';
 import { useState } from 'react';
@@ -156,6 +157,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="flex h-screen overflow-hidden bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-white transition-colors duration-200">
+
+            <IdleLogoutWarning timeoutMinutes={15} />
 
             {/* Mobile Sidebar Overlay */}
             <Transition.Root show={isMobileMenuOpen} as={Fragment}>
