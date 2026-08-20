@@ -62,15 +62,7 @@ echo "[MIGRATE] Running migrations..."
 php artisan migrate --force
 
 # -------------------------------------------------------------------
-# 7. Optionally seed the database
-# -------------------------------------------------------------------
-if [ "${DB_SEED:-false}" = "true" ]; then
-    echo "[SEED] Seeding database..."
-    php artisan db:seed --force
-fi
-
-# -------------------------------------------------------------------
-# 8. Laravel optimizations (cache config, routes, views)
+# 7. Laravel optimizations (cache config, routes, views)
 # -------------------------------------------------------------------
 echo "[CACHE] Caching config & routes..."
 php artisan config:cache
@@ -78,7 +70,7 @@ php artisan route:cache
 php artisan view:cache
 
 # -------------------------------------------------------------------
-# 9. Fix storage permissions
+# 8. Fix storage permissions
 # -------------------------------------------------------------------
 echo "[PERMS] Setting storage permissions..."
 chmod -R 775 storage bootstrap/cache

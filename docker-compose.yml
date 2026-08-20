@@ -38,7 +38,6 @@ services:
       - DB_DATABASE=${DB_DATABASE:-jobtrack}
       - DB_USERNAME=${DB_USERNAME:-jobtrack}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - DB_SEED=${DB_SEED:-false}
     depends_on:
       mysql:
         condition: service_healthy
