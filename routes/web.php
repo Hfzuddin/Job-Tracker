@@ -35,18 +35,24 @@ Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
     
     $jobs = $query->orderBy('date_applied', $direction)->paginate(10)->withQueryString();
 
+    $goal = app(\App\Services\GoalService::class)->progressFor(auth()->user());
+
     return Inertia::render('Dashboard', [
         'jobs' => $jobs,
+        'goal' => $goal,
         'filters' => [
             'status' => $request->input('status', 'all'),
             'platform' => $request->input('platform', 'all'),
             'date_order' => $direction,
         ]
     ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware('auth')->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::resource('jobs', \App\Http\Controllers\JobController::class)->except(['show']);
+    Route::get('/analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::patch('/goal', [\App\Http\Controllers\GoalController::class, 'update'])->name('goal.update');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
     Route::get('/profile/delete', [ProfileController::class, 'delete'])->name('profile.delete');

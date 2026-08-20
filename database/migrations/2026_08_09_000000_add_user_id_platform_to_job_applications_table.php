@@ -8,6 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // job_applications was dropped by the 2026_08_08_232426 migration on fresh installs;
+        // this migration only applies to older databases where the table still exists.
+        if (! Schema::hasTable('job_applications')) {
+            return;
+        }
+
         Schema::table('job_applications', function (Blueprint $table) {
             // Add user_id foreign key (nullable to allow existing rows)
             $table->foreignId('user_id')->nullable()->after('id')->constrained()->cascadeOnDelete();

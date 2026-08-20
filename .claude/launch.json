@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jobtrack-dev",
+      "runtimeExecutable": "powershell.exe",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-Command",
+        "$env:PATH = 'D:\\laragon\\bin\\php\\php-8.3.30-Win32-vs16-x64;D:\\laragon\\bin\\composer;' + $env:PATH; npx concurrently -c \"#93c5fd,#fdba74\" \"php artisan serve\" \"npm run dev\" --names=server,vite --kill-others"
+      ],
+      "port": 8000
+    }
+  ]
+}

@@ -2,11 +2,12 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link, usePage } from '@inertiajs/react';
 import useTheme from '@/Hooks/useTheme';
 import { useState } from 'react';
-import { Dialog, Transition, Disclosure } from '@headlessui/react';
+import { Dialog, Transition, Disclosure, Popover } from '@headlessui/react';
 import { Fragment } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const notifications = usePage().props.notifications ?? [];
     const { theme, toggleTheme } = useTheme();
     const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,6 +35,16 @@ export default function AuthenticatedLayout({ header, children }) {
                 { name: 'Add Job', href: route('jobs.create'), current: route().current('jobs.create') },
                 { name: 'Edit / Delete', href: route('jobs.index'), current: route().current('jobs.index') },
             ]
+        },
+        {
+            name: 'Analytics',
+            href: route('analytics.index'),
+            current: route().current('analytics.index'),
+            icon: (
+                <svg className="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            ),
         },
         {
             name: 'Profile',
@@ -269,6 +280,62 @@ export default function AuthenticatedLayout({ header, children }) {
                         {/* Empty space for desktop to keep flex justify-between aligned */}
                     </div>
                     <div className="flex items-center gap-x-4">
+                        <Popover className="relative">
+                            <Popover.Button className="relative flex-shrink-0 rounded-full p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-zinc-800 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900">
+                                <span className="sr-only">View notifications</span>
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                {notifications.length > 0 && (
+                                    <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500" />
+                                    </span>
+                                )}
+                            </Popover.Button>
+
+                            <Transition
+                                enter="transition ease-out duration-200"
+                                enterFrom="opacity-0 -translate-y-1"
+                                enterTo="opacity-100 translate-y-0"
+                                leave="transition ease-in duration-150"
+                                leaveFrom="opacity-100 translate-y-0"
+                                leaveTo="opacity-0 -translate-y-1"
+                            >
+                                <Popover.Panel className="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg focus:outline-none dark:border-zinc-800 dark:bg-zinc-900">
+                                    <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-800">
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                            Notifications
+                                        </p>
+                                    </div>
+
+                                    {notifications.length === 0 ? (
+                                        <p className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            You're all caught up.
+                                        </p>
+                                    ) : (
+                                        <ul className="max-h-80 divide-y divide-gray-100 overflow-y-auto dark:divide-zinc-800">
+                                            {notifications.map((job) => (
+                                                <li key={job.id}>
+                                                    <Link
+                                                        href={route('jobs.edit', job.id)}
+                                                        className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800/60"
+                                                    >
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                            {job.company_name} — {job.job_name}
+                                                        </p>
+                                                        <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400">
+                                                            No update in {job.days_since_applied} days · {job.status}
+                                                        </p>
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </Popover.Panel>
+                            </Transition>
+                        </Popover>
+
                         <span className="text-sm font-medium text-gray-600 dark:text-gray-400 hidden sm:block">
                             {user.name}
                         </span>

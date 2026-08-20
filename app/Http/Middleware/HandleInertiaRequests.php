@@ -34,6 +34,23 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
+            'notifications' => $request->user()
+                ? $request->user()->jobs()
+                    ->needsFollowUp()
+                    ->orderBy('date_applied')
+                    ->get()
+                    ->map(fn ($job) => [
+                        'id' => $job->id,
+                        'company_name' => $job->company_name,
+                        'job_name' => $job->job_name,
+                        'status' => $job->status,
+                        'days_since_applied' => (int) abs(now()->diffInDays($job->date_applied)),
+                    ])
+                : [],
         ];
     }
 }

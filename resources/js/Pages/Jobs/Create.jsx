@@ -29,7 +29,7 @@ export default function Create({ auth }) {
 
             <div className="py-2">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-zinc-900 p-4 shadow sm:rounded-lg sm:p-8 border border-transparent dark:border-zinc-800 transition-colors duration-200">
+                    <div className="bg-white dark:bg-zinc-900 p-4 shadow-md sm:rounded-lg sm:p-8 border border-transparent dark:border-zinc-800 transition-colors duration-200">
                         <section className="max-w-4xl">
                             <header>
                                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">

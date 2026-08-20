@@ -107,7 +107,7 @@ export default function Index({ jobs, filters = {} }) {
                         </div>
                     </div>
 
-                    <div className="overflow-hidden bg-white dark:bg-zinc-900 p-4 shadow sm:rounded-lg sm:p-8 transition-colors duration-200 border border-transparent dark:border-zinc-800">
+                    <div className="overflow-hidden bg-white dark:bg-zinc-900 p-4 shadow-md sm:rounded-lg sm:p-8 transition-colors duration-200 border border-transparent dark:border-zinc-800">
                         <div className="p-0 text-gray-900 dark:text-gray-100">
                             {jobs.data.length === 0 ? (
                                 <div className="text-center py-10">

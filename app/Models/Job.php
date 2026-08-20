@@ -11,6 +11,8 @@ class Job extends Model
 
     protected $table = 'job_postings';
 
+    public const FOLLOW_UP_AFTER_DAYS = 7;
+
     protected $fillable = [
         'company_name',
         'job_name',
@@ -23,5 +25,15 @@ class Job extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Applications stuck in an early stage for long enough that a follow-up is worth sending.
+     */
+    public function scopeNeedsFollowUp($query, int $days = self::FOLLOW_UP_AFTER_DAYS)
+    {
+        return $query
+            ->whereIn('status', ['applied', 'reviewed'])
+            ->where('date_applied', '<=', now()->subDays($days));
     }
 }

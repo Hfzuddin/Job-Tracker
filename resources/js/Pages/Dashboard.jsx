@@ -1,11 +1,22 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { AnimatedProgressCard } from '@/Components/ui/progress-card';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Dashboard({ jobs, filters = {} }) {
+export default function Dashboard({ jobs, goal, filters = {} }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || 'all');
     const [platformFilter, setPlatformFilter] = useState(filters.platform || 'all');
     const [dateOrder, setDateOrder] = useState(filters.date_order || 'desc');
+    const [editingGoal, setEditingGoal] = useState(false);
+    const [goalInput, setGoalInput] = useState(goal?.goal ?? 5);
+
+    const saveGoal = (e) => {
+        e.preventDefault();
+        router.patch(route('goal.update'), { weekly_goal: goalInput }, {
+            preserveScroll: true,
+            onSuccess: () => setEditingGoal(false),
+        });
+    };
 
     const handleFilterChange = (key, value) => {
         if (key === 'status') setStatusFilter(value);
@@ -47,6 +58,56 @@ export default function Dashboard({ jobs, filters = {} }) {
 
             <div className="py-2">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {goal && (
+                        <div className="relative mb-4">
+                            <AnimatedProgressCard
+                                className="w-full"
+                                title="Weekly Goal"
+                                icon={
+                                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                }
+                                progressLabel="Applications"
+                                progressSubLabel={
+                                    goal.streak_weeks > 0
+                                        ? `🔥 ${goal.streak_weeks} week${goal.streak_weeks === 1 ? '' : 's'} streak`
+                                        : 'This week'
+                                }
+                                currentValue={goal.current_week_count}
+                                maxValue={goal.goal}
+                            />
+
+                            <div className="absolute top-6 right-6">
+                                {editingGoal ? (
+                                    <form onSubmit={saveGoal} className="flex items-center gap-2">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="50"
+                                            value={goalInput}
+                                            onChange={(e) => setGoalInput(e.target.value)}
+                                            className="w-16 rounded-md border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 dark:focus:border-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 sm:text-sm px-2 py-1"
+                                        />
+                                        <button type="submit" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                                            Save
+                                        </button>
+                                        <button type="button" onClick={() => setEditingGoal(false)} className="text-xs text-gray-400 hover:underline">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button
+                                        onClick={() => { setGoalInput(goal.goal); setEditingGoal(true); }}
+                                        className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                                    >
+                                        Edit goal
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Your Applications</h3>
                         <div className="flex gap-4">
@@ -98,7 +159,7 @@ export default function Dashboard({ jobs, filters = {} }) {
                         </div>
                     </div>
 
-                    <div className="overflow-hidden bg-white dark:bg-zinc-900 p-4 shadow sm:rounded-lg sm:p-8 transition-colors duration-200 border border-transparent dark:border-zinc-800">
+                    <div className="overflow-hidden bg-white dark:bg-zinc-900 p-4 shadow-md sm:rounded-lg sm:p-8 transition-colors duration-200 border border-transparent dark:border-zinc-800">
                         <div className="p-0 text-gray-900 dark:text-gray-100">
                             {jobs.data.length === 0 ? (
                                 <div className="text-center py-10">

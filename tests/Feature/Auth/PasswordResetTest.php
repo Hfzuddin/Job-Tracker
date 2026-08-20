@@ -3,71 +3,74 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_reset_password_link_screen_can_be_rendered(): void
+    public function test_reset_password_screen_can_be_rendered(): void
     {
         $response = $this->get('/forgot-password');
 
         $response->assertStatus(200);
     }
 
-    public function test_reset_password_link_can_be_requested(): void
+    public function test_user_can_reset_password_with_valid_email(): void
     {
-        Notification::fake();
+        $user = User::factory()->create([
+            'password' => Hash::make('old-password'),
+        ]);
 
-        $user = User::factory()->create();
+        $response = $this->post('/forgot-password', [
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response->assertRedirect(route('login'));
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
     }
 
-    public function test_reset_password_screen_can_be_rendered(): void
+    public function test_reset_fails_when_email_does_not_exist(): void
     {
-        Notification::fake();
+        $response = $this->post('/forgot-password', [
+            'email' => 'nobody@example.com',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
 
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get('/reset-password/'.$notification->token);
-
-            $response->assertStatus(200);
-
-            return true;
-        });
+        $response->assertSessionHasErrors('email');
     }
 
-    public function test_password_can_be_reset_with_valid_token(): void
+    public function test_reset_fails_when_confirmation_does_not_match(): void
     {
-        Notification::fake();
-
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response = $this->post('/forgot-password', [
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'different-password',
+        ]);
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
+        $response->assertSessionHasErrors('password');
+    }
 
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login'));
+    public function test_reset_fails_when_new_password_matches_current_password(): void
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('same-password'),
+        ]);
 
-            return true;
-        });
+        $response = $this->post('/forgot-password', [
+            'email' => $user->email,
+            'password' => 'same-password',
+            'password_confirmation' => 'same-password',
+        ]);
+
+        $response->assertSessionHasErrors('password');
     }
 }

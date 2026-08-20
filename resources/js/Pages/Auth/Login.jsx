@@ -4,9 +4,10 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -28,6 +29,12 @@ export default function Login({ status, canResetPassword }) {
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600 dark:text-green-400">
                     {status}
+                </div>
+            )}
+
+            {flash?.error && (
+                <div className="mb-4 text-sm font-medium text-red-600 dark:text-red-400">
+                    {flash.error}
                 </div>
             )}
 
@@ -80,15 +87,13 @@ export default function Login({ status, canResetPassword }) {
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 dark:text-gray-400 underline hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 transition-colors"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
+                <div className="mt-4 flex items-center justify-between">
+                    <Link
+                        href={route('password.request')}
+                        className="rounded-md text-sm text-gray-600 dark:text-gray-400 underline hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 transition-colors"
+                    >
+                        Forgot your password?
+                    </Link>
 
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Log in
