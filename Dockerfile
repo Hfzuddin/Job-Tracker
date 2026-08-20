@@ -44,7 +44,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 # PHP configuration
 RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-COPY docker/php/opcache.ini "$PHP_INI_DIR/conf.d/opcache.ini" 2>/dev/null || true
 
 WORKDIR /var/www/html
 
