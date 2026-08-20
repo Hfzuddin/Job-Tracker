@@ -99,7 +99,3 @@ Click the 🔔 bell icon next to your name at any time — it lists every applic
 
 ### Platform Analytics
 Visit the **Analytics** page to see which platforms are converting into interviews most often, based on your own application history.
-
-## License
-
-Open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
